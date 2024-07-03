@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="static\style.css">
+    <title>Responsive Dashboard Design #2 | AsmrProg</title>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#" class="logo">
+            <img src="static/images/image.png" style="width: 50px; height: 50px; margin-right: 10px;">
+            <div class="logo-name"><span>EMERGERE</div>
+        </a>
+        <ul class="side-menu">
+            <li>
+              <a href="#">
+                <i class="fa fa-bar-chart"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa fa-users"></i>
+                <span>Employees</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fa fa-cog"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+           
+          </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="#" class="logout">
+                    <i class='fa fa-log-out-circle'></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Navbar -->
+        <nav>
+           
+            <form action="#">
+                <div class="form-input">
+                    <input type="search" placeholder="Search...">
+                    <button class="search-btn" type="submit"><i class="fa fa-search" style="font-size: medium;"></i></i></button>
+                </div>
+            </form>
+            <input type="checkbox" id="theme-toggle" hidden>
+            <label for="theme-toggle" class="theme-toggle"></label>
+            <i class="fa fa-bars" aria-hidden="true"></i>
+            <a href="#" class="profile">
+                <img src="static/images/logo.png">
+            </a>
+        </nav>
+
+        <!-- End of Navbar -->
+
+        <main>
+            <div class="header">
+                <div class="left">
+                    <h1>Dashboard</h1>
+                    <ul class="breadcrumb">
+                        <li><a href="#">
+                                Analytics
+                            </a></li>
+                    </ul>
+                </div>
+            </div>
+
+            
+
+            <div class="bottom-data">
+                <div class="uploads">
+                  <div class="header">
+                    <div class="card">
+                      <h3>Upload File</h3>
+                      <div class="drop_box">
+                        <header>
+                          <h4>Select File here</h4>
+                        </header>
+                        <p>Files Supported: XLS, XLSX</p>
+                        <form action="/upload" method="post" enctype="multipart/form-data">
+                          <input type="file" name="file" accept=".xlsx, .xls" id="fileInput">
+                          <button class="btn" type="submit">Upload File</button>
+                      </form>                      
+                        <style>
+                            .btn {
+                                padding: 12px 50px;
+                                border: none;
+                                border-radius: 5px;
+                                background-color: #1abc9c;
+                                color: #fff;
+                                font-size: 18px;
+                                outline: none;
+                                cursor: pointer;
+                                position: relative;
+                                overflow: hidden;
+                                box-shadow: 6px 7px 40px -4px
+                                        rgba(0, 0, 0, 0.2);
+                                }
+                        </style>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </main>
+    </div>
+
+    <script src="static\index.js"></script>
+</body>
+
+</html>
