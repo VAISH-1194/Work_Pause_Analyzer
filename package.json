@@ -1,5 +1,0 @@
-{
-    "scripts": {
-      "build": "netlify-lambda build functions"
-    }
-  }
