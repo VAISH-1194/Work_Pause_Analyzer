@@ -1,0 +1,11 @@
+[build]
+  command = "pip install -r requirements.txt && netlify-lambda build functions"
+  publish = "static"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/app"
+  status = 200
+
+[functions]
+  directory = "WPA"
