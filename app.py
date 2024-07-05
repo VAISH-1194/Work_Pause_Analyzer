@@ -88,7 +88,7 @@ def upload_file():
 
     def mark_columns_empty(row):
         words_to_check = ['Att. Date', 'InTime', 'OutTime', 'Shift', 'S. InTime', 'S. OutTime',
-                        'Punch Records', 'Emp Code:', 'Employee Name :', 'Department:', 'Records']
+                        'Punch Records', 'Records']
         
         if row.name > 0: 
             for word in words_to_check:
@@ -104,7 +104,7 @@ def upload_file():
     df['Records Status'] = df.apply(lambda row: update_status_based_on_records(row['Records'], row['Punch Records']), axis=1)
 
     cols_to_check = ['Att. Date', 'InTime', 'OutTime', 'Shift', 'S. InTime', 'S. OutTime',
-                    'Punch Records', 'Emp Code:', 'Employee Name :', 'Department:', 'Records']
+                    'Punch Records', 'Records']
 
     def check_nan_and_update_status(row, cols_to_check):
         if all(pd.isna(row[col]) for col in cols_to_check):
@@ -182,7 +182,7 @@ def upload_file():
 
     def mark_columns_empty(row):
         words_to_check = ['Att. Date', 'InTime', 'OutTime', 'Shift', 'S. InTime', 'S. OutTime',
-                        'Punch Records', 'Emp Code:', 'Employee Name :', 'Department:', 'Records']
+                        'Punch Records', 'Records']
         
         if row.name > 0:
             for word in words_to_check:
@@ -219,7 +219,7 @@ def upload_file():
         df['Records Status'] = df.apply(lambda row: update_status_based_on_records(row['Records'], row['Punch Records']), axis=1)
 
     cols_to_check = ['Att. Date', 'InTime', 'OutTime', 'Shift', 'S. InTime', 'S. OutTime',
-                    'Punch Records', 'Emp Code:', 'Employee Name :', 'Department:', 'Records']
+                    'Punch Records', 'Records']
 
     def check_nan_and_update_status(row, cols_to_check):
 
@@ -256,6 +256,13 @@ def upload_file():
     def should_drop_row(row):
         first_cell_value = str(row.iloc[0])
         return first_cell_value.startswith(('Total', 'Department', 'Emp Code'))
+
+# Drop rows based on the condition
+    df = df[~df.apply(should_drop_row, axis=1)]
+
+# Reset the index if needed
+    df.reset_index(drop=True, inplace=True)
+
 
 
     df = df[~df.apply(should_drop_row, axis=1)]
