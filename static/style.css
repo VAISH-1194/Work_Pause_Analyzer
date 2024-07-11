@@ -237,26 +237,25 @@ body{
     padding: 0 16px;
     height: 100%;
     border: none;
-    background: var(--grey);
+    background: var(--light);
     border-radius: 36px 0 0 36px;
     outline: none;
-    width: 100%;
+    width: 0%;
     color: var(--dark);
 }
 
 .content nav form .form-input button{
-    width: 80px;
+    width: 0px;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--primary);
+    background: var(--light);
     color: var(--light);
     font-size: 18px;
     border: none;
     outline: none;
     border-radius: 0 36px 36px 0;
-    cursor: pointer;
 }
 
 .content nav .notif{
@@ -662,3 +661,272 @@ body{
     border-radius: 4px;
   }
   
+
+/* Rotating CSS */
+.rotatingText {
+    margin-top: -5rem;
+    align-items: center;
+    display: flex;
+    height: 20vh;
+    text-align: center;
+    color: var(--dark);
+  }
+  
+  .rotatingText-content {
+    position: relative;
+    width: 100%;
+  }
+  
+  .rotatingText-description {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 14px;
+    margin: 0;
+  }
+  
+  @media (min-width: 768px) {
+    .rotatingText-description {
+      font-size: 18px;
+    }
+  }
+  
+  .rotatingText-adjective {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 20px;
+    left: 0;
+    margin-bottom: 0;
+    margin-top: 30px;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    text-transform: uppercase;
+    top: 0;
+  
+    @media (min-width: 768px) {
+      font-size: 20px;
+    }
+  }
+  
+  .rotatingText-adjective:nth-of-type(1) {
+    animation: rotate-text-up 6s infinite 0s;
+  }
+  
+  .rotatingText-adjective:nth-of-type(2) {
+    animation: rotate-text-up 6s infinite 2s;
+  }
+  
+  .rotatingText-adjective:nth-of-type(3) {
+    animation: rotate-text-up 6s infinite 4s;
+  }
+  
+  @keyframes rotate-text-up {
+    0%, 15% {
+      opacity: 0;
+      transform: translate3d(0, 40px, 0);
+    }
+  
+    20%, 50% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  
+    55%, 100% {
+      opacity: 0;
+      transform: translate3d(0, -40px, 0);
+    }
+  }
+  
+
+
+  /* Animal Animation */
+
+  marquee {
+    top: 0;
+  }
+
+  .animal {
+    width: 1500%;
+  }
+
+
+
+  /* Wavy Text */
+
+
+  /* .waveTextAnimated {
+    margin-top: 0.6em;
+    text-align: center;
+}
+
+.waveTextAnimated span {
+    display: inline-block;
+    -webkit-animation: wave-text 1s ease-in-out infinite;
+            animation: wave-text 1s ease-in-out infinite;
+  }
+
+  .waveTextAnimated span:nth-of-type(1) {
+    -webkit-animation-delay: 0s;
+            animation-delay: 0s;
+  }
+  .waveTextAnimated span:nth-of-type(2) {
+    -webkit-animation-delay: 0.1s;
+            animation-delay: 0.1s;
+  }
+  .waveTextAnimated span:nth-of-type(3) {
+    -webkit-animation-delay: 0.2s;
+            animation-delay: 0.2s;
+  }
+  .waveTextAnimated span:nth-of-type(4) {
+    -webkit-animation-delay: 0.3s;
+            animation-delay: 0.3s;
+  }
+  .waveTextAnimated span:nth-of-type(5) {
+    -webkit-animation-delay: 0.4s;
+            animation-delay: 0.4s;
+  }
+  .waveTextAnimated span:nth-of-type(6) {
+    -webkit-animation-delay: 0.5s;
+            animation-delay: 0.5s;
+  }
+  .waveTextAnimated span:nth-of-type(7) {
+    -webkit-animation-delay: 0.6s;
+            animation-delay: 0.6s;
+  }
+  .waveTextAnimated span:nth-of-type(8) {
+    -webkit-animation-delay: 0.7s;
+            animation-delay: 0.7s;
+  }
+
+  @-webkit-keyframes wave-text {
+    00% {
+      transform: translateY(0em);
+    }
+    60% {
+      transform: translateY(-0.6em);
+    }
+    100% {
+      transform: translateY(0em);
+    }
+  }
+   
+  @keyframes wave-text {
+    00% {
+      transform: translateY(0em);
+    }
+    60% {
+      transform: translateY(-0.6em);
+    }
+    100% {
+      transform: translateY(0em);
+    }
+  } */
+
+
+
+
+
+
+  .deconstructed {
+    position: relative;
+    margin: auto;
+    height: 0.71em;
+    color: transparent;
+    font-family: 'Cambay', sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.03em;
+  }
+  
+  .deconstructed > div {
+    position: absolute;
+    top: -15;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--dark);
+    pointer-events: none;
+  }
+  
+  .deconstructed > div:nth-child(1) {
+    -webkit-mask-image: linear-gradient(black 25%, transparent 25%);
+    mask-image: linear-gradient(black 25%, transparent 25%);
+    animation: deconstructed1 5s infinite;
+  }
+  
+  .deconstructed > div:nth-child(2) {
+    -webkit-mask-image: linear-gradient(transparent 25%, black 25%, black 50%, transparent 50%);
+    mask-image: linear-gradient(transparent 25%, black 25%, black 50%, transparent 50%);
+    animation: deconstructed2 5s infinite;
+  }
+  
+  .deconstructed > div:nth-child(3) {
+     -webkit-mask-image: linear-gradient(transparent 50%, black 50%, black 75%, transparent 75%);
+    mask-image: linear-gradient(transparent 50%, black 50%, black 75%, transparent 75%);
+    animation: deconstructed3 5s infinite;
+  }
+  
+  .deconstructed > div:nth-child(4) {
+     -webkit-mask-image: linear-gradient(transparent 75%, black 75%);
+    mask-image: linear-gradient(transparent 75%, black 75%);
+    animation: deconstructed4 5s infinite;
+  }
+  
+  @keyframes deconstructed1 {
+    0% {
+      transform: translateX(100%);
+    }
+    26% {
+      transform: translateX(0%);
+    }
+    83% {
+      transform: translateX(-0.1%);
+    }
+    100% {
+      transform: translateX(-120%);
+    }
+  }
+  
+  @keyframes deconstructed2 {
+    0% {
+      transform: translateX(100%);
+    }
+    24% {
+      transform: translateX(0.5%);
+    }
+    82% {
+      transform: translateX(-0.2%);
+    }
+    100% {
+      transform: translateX(-125%);
+    }
+  }
+  
+  @keyframes deconstructed3 {
+    0% {
+      transform: translateX(100%);
+    }
+    22% {
+      transform: translateX(0%);
+    }
+    81% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-130%);
+    }
+  }
+  
+  @keyframes deconstructed4 {
+    0% {
+      transform: translateX(100%);
+    }
+    20% {
+      transform: translateX(0%);
+    }
+    80% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-135%);
+    }
+  }
