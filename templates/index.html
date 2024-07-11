@@ -7,6 +7,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="static\style.css">
     <title>Emergere Attendance Dashboard</title>
+    <style>
+      :root {
+          --main-color: #ecf0f1;
+          --point-color: #555;
+          --size: 5px;
+      }
+
+      .loader {
+          background-color: var(--main-color);
+          overflow: hidden;
+          width: 100%;
+          height: 100%;
+          position: fixed;
+          top: 0; left: 0;
+          display: none;
+          align-items: center;
+          align-content: center; 
+          justify-content: center;  
+          z-index: 100000;
+      }
+
+      .loader__element {
+          border-radius: 100%;
+          border: var(--size) solid var(--point-color);
+          margin: calc(var(--size) * 2);
+      }
+
+      .loader__element:nth-child(1) {
+          animation: preloader .6s ease-in-out alternate infinite;
+      }
+      .loader__element:nth-child(2) {
+          animation: preloader .6s ease-in-out alternate .2s infinite;
+      }
+
+      .loader__element:nth-child(3) {
+          animation: preloader .6s ease-in-out alternate .4s infinite;
+      }
+
+      @keyframes preloader {
+          100% { transform: scale(2); }
+      }
+  </style>
 </head>
 
 <body>
@@ -15,7 +57,26 @@
     <div class="sidebar">
         <a href="#" class="logo">
             <img src="static/images/image.png" style="width: 50px; height: 50px; margin-right: 10px;">
-            <div class="logo-name"><span>EMERGERE</div>
+            <div class="logo-name"><span>
+              <!-- <div class="waveTextAnimated">
+                <span>E</span>
+                <span>M</span>
+                <span>E</span>
+                <span>R</span>
+                <span>G</span>
+                <span>E</span>
+                <span>R</span>
+                <span>E</span>
+              </div> -->
+
+              <div class="deconstructed">
+                EMERGERE
+                <div>EMERGERE</div>
+                <div>EMERGERE</div>
+                <div>EMERGERE</div>
+                <div>EMERGERE</div>
+              </div>
+            </div>
         </a>
         <ul class="side-menu">
             <li>
@@ -26,13 +87,13 @@
             </li>
             <li>
               <a href="#">
-                <i class="fa fa-users"></i>
-                <span>Employees</span>
+                <i class="fa fa-solid fa-chart-line"></i>
+                <span>Accuracy</span>
               </a>
             </li>
             <li>
               <a href="#">
-                <i class="fa fa-cog"></i>
+                <i class="fa fa-solid fa-folder-tree"></i>
                 <span>Settings</span>
               </a>
             </li>
@@ -41,7 +102,7 @@
         <ul class="side-menu">
             <li>
                 <a href="#" class="logout">
-                    <i class='fa fa-log-out-circle'></i>
+                  <i class="fa fa-solid fa-right-from-bracket"></i>
                     Logout
                 </a>
             </li>
@@ -54,9 +115,17 @@
         <!-- Navbar -->
         <nav>
            
+          <div class="animal">
+          <marquee direction="right" scrollamount="15">
+            <img src="static\images\a.gif" width="15%" height="65"/> &emsp;&emsp;&emsp;
+            <img src="static/images/b.gif" width="8%" height="45" />&emsp;&nbsp;
+            <img src="static\images\d.gif" width="8%" height="45"/>&nbsp;&nbsp;&emsp;&emsp;
+              <img src="static\images\c.gif" width="3%" height="25"/>&nbsp;
+          </marquee>
+        </div>
+
             <form action="#">
                 <div class="form-input">
-                    <input type="search" placeholder="Search...">
                     <button class="search-btn" type="submit"><i class="fa fa-search" style="font-size: medium;"></i></i></button>
                 </div>
             </form>
@@ -70,7 +139,20 @@
 
         <!-- End of Navbar -->
 
-        <main>
+        <main>          
+          <div class="rotatingText">
+            <div class="rotatingText-content">
+              <p class="rotatingText-description">
+                Hi there, Admin! &hellip;
+              </p>
+          
+              <h2 class="rotatingText-adjective">We hope you’re having a fantastic day!</h2>
+              <h2 class="rotatingText-adjective">Let’s make today amazing!</h2>
+              <h2 class="rotatingText-adjective"> It’s always a pleasure to have you here!</h2>
+            </div>
+          </div>
+
+
             <div class="header">
                 <div class="left">
                     <h1>Dashboard</h1>
@@ -82,45 +164,132 @@
                 </div>
             </div>
 
+
+            
+
+
+            <div class="bottom-data">
+              <div class="uploads">
+                  <div class="header">
+                      <div class="card">
+                          <h3>Upload File to Split</h3>
+                          <div class="drop_box">
+                              <header>
+                                  <h4>Select File here</h4>
+                              </header>
+                              <p>Files Supported: XLS, XLSX</p>
+                              <form action="/split" method="post" enctype="multipart/form-data">
+                                <input type="file" name="file" accept=".xlsx, .xls" id="fileInput">
+                                <button class="btn" type="submit">Upload Files</button>
+                            </form>
+                                                   
+                              <style>
+                                  .btn {
+                                      padding: 12px 50px;
+                                      border: none;
+                                      border-radius: 5px;
+                                      background-color: #1abc9c;
+                                      color: #fff;
+                                      font-size: 18px;
+                                      outline: none;
+                                      cursor: pointer;
+                                      position: relative;
+                                      overflow: hidden;
+                                      box-shadow: 6px 7px 40px -4px rgba(0, 0, 0, 0.2);
+                                  }
+                              </style>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
             
 
             <div class="bottom-data">
-                <div class="uploads">
+              <div class="uploads">
                   <div class="header">
-                    <div class="card">
-                      <h3>Upload File</h3>
-                      <div class="drop_box">
-                        <header>
-                          <h4>Select File here</h4>
-                        </header>
-                        <p>Files Supported: XLS, XLSX</p>
-                        <form action="/upload" method="post" enctype="multipart/form-data">
-                          <input type="file" name="file" accept=".xlsx, .xls" id="fileInput">
-                          <button class="btn" type="submit">Upload File</button>
-                      </form>                      
-                        <style>
-                            .btn {
-                                padding: 12px 50px;
-                                border: none;
-                                border-radius: 5px;
-                                background-color: #1abc9c;
-                                color: #fff;
-                                font-size: 18px;
-                                outline: none;
-                                cursor: pointer;
-                                position: relative;
-                                overflow: hidden;
-                                box-shadow: 6px 7px 40px -4px
-                                        rgba(0, 0, 0, 0.2);
-                                }
-                        </style>
+                      <div class="card">
+                          <h3>Upload Files to Calculate</h3>
+                          <div class="drop_box">
+                              <header>
+                                  <h4>Select Files here</h4>
+                              </header>
+                              <p>Files Supported: XLS, XLSX</p>
+                              <form action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" name="file" accept=".xlsx, .xls" id="fileInput" multiple>
+                                <button class="btn" type="submit">Upload Files</button>
+                            </form>                            
+                              <style>
+                                  .btn {
+                                      padding: 12px 50px;
+                                      border: none;
+                                      border-radius: 5px;
+                                      background-color: #1abc9c;
+                                      color: #fff;
+                                      font-size: 18px;
+                                      outline: none;
+                                      cursor: pointer;
+                                      position: relative;
+                                      overflow: hidden;
+                                      box-shadow: 6px 7px 40px -4px rgba(0, 0, 0, 0.2);
+                                  }
+                              </style>
+                          </div>
                       </div>
-                    </div>
                   </div>
-                </div>
               </div>
+          </div>
+            
+        
         </main>
     </div>
+
+ <div class="loader">
+        <span class="loader__element"></span>
+        <span class="loader__element"></span>
+        <span class="loader__element"></span>
+    </div>
+
+    <script src="static/index.js"></script>
+    <script>
+      function showLoader() {
+          document.querySelector('.loader').style.display = 'flex';
+      }
+  
+    
+      window.addEventListener('load', function () {
+          var loader = document.querySelector('.loader');
+          if (loader) {
+              loader.style.display = 'none';
+          }
+      });
+  
+    
+      document.querySelectorAll('form').forEach(form => {
+          form.addEventListener('submit', function(event) {
+              event.preventDefault();
+              showLoader();
+              const formData = new FormData(this);
+              fetch(this.action, {
+                  method: this.method,
+                  body: formData
+              }).then(response => {
+                  return response.blob();
+              }).then(blob => {
+                  var link = document.createElement('a');
+                  var fileName = (this.action.includes('/split')) ? 'split_tables' : 'processed_files'; // Determine filename based on form action
+                  link.href = window.URL.createObjectURL(blob);
+                  link.download = fileName; 
+                  link.click();
+                  document.querySelector('.loader').style.display = 'none';
+              }).catch(error => {
+                  console.error('Error:', error);
+                  document.querySelector('.loader').style.display = 'none';
+              });
+          });
+      });
+  </script>
+  
 
     <script src="static\index.js"></script>
 </body>
