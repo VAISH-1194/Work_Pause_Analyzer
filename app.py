@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import zipfile
 from split import split_tables
-from datetime import datetime
+from datetime import datetime, timedelta
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Alignment, Border, Side
 from werkzeug.utils import secure_filename
@@ -30,11 +30,23 @@ def upload_file():
     for file in files:
         df = pd.read_excel(file)
 
+        def drop_specific_rows(df):
+            df = df.astype(str)
+            mask = df.apply(lambda row: row.str.startswith(('Total')).any(), axis=1)
+            df = df[~mask]
+            return df
+
+        df = drop_specific_rows(df)
+
         def move_rows_to_end(df):
             condition = df.iloc[:, 1].astype(str).str.startswith(("Department", "Emp Code"))
+
             rows_to_move = df[condition]
+
             remaining_rows = df[~condition]
+
             result_df = pd.concat([remaining_rows, rows_to_move], ignore_index=True)
+
             df.iloc[:] = result_df
 
         move_rows_to_end(df)
@@ -47,6 +59,8 @@ def upload_file():
 
         columns_to_keep = ["Att. Date", "InTime", "OutTime", "Shift", "S. InTime", "S. OutTime", "Punch Records"]
         df = df[columns_to_keep]
+
+        df = pd.DataFrame(df)
         df['Records'] = df['Punch Records']
 
 
@@ -56,9 +70,50 @@ def upload_file():
             entries = records.split(',')
             entries = [entry.replace('BD', 'ED') for entry in entries]
             entries = [entry.replace('Main Entrance', 'ED').replace('Exit', 'ED') for entry in entries]
-            return ', '.join(entries)
 
+            return ', '.join(entries)
         df['Records'] = df['Records'].apply(change_name)
+
+
+        def update_in_out_times(row):
+            records = row["Punch Records"]
+            
+            if pd.isna(records):
+                return pd.Series({'InTime': ' ', 'OutTime': ' '})
+            
+            entries = records.split(',')
+            in_time_matches = re.findall(r"\d{2}:\d{2}", entries[0]) if entries else []
+            in_time = in_time_matches[0] if in_time_matches else ' '
+            
+            last_entry = entries[-2] if len(entries) > 1 else ' '
+            out_time_matches = re.findall(r"\d{2}:\d{2}", last_entry) if last_entry else []
+            out_time = out_time_matches[0] if out_time_matches else ' '
+            
+            if 'out' not in last_entry:
+                out_time += ", records missing"
+            
+            return pd.Series({'InTime': in_time, 'OutTime': out_time})
+
+        df_filtered = df[~df['Att. Date'].str.startswith(('Emp Code', 'Department'))]
+
+        df_filtered.loc[:, ['InTime', 'OutTime']] = df_filtered.apply(update_in_out_times, axis=1)
+
+
+        df.update(df_filtered[['InTime', 'OutTime']])
+
+        df['InTime'] = df['InTime'].fillna(' ')
+        df['OutTime'] = df['OutTime'].fillna(' ')
+
+
+        def remove_1st_entries(record):
+            if pd.isna(record):
+                return record
+
+            entries = record.split(', ')
+            filtered_entries = [entry for entry in entries if "1st" not in entry]
+            return ', '.join(filtered_entries)
+
+        df['Records'] = df['Records'].apply(remove_1st_entries)
 
 
         def filter_punch_records(record):
@@ -72,8 +127,35 @@ def upload_file():
             return ','.join(valid_entries)
 
         df['Records'] = df['Records'].apply(filter_punch_records)
+
+        df['Corrected Records'] = df['Records']
+
+        def calculate_duration(row):
+            in_time_str = row['InTime']
+            out_time_str = row['OutTime'].replace(", records missing", "").strip()
+            
+            if in_time_str == ' ' or out_time_str == ' ':
+                return ' '
+            
+            try:
+                in_time = datetime.strptime(in_time_str, '%H:%M')
+                out_time = datetime.strptime(out_time_str, '%H:%M')
+                
+                if out_time < in_time:
+                    out_time += pd.DateOffset(days=1)
+                
+                duration = out_time - in_time
+                total_minutes = duration.total_seconds() / 60
+                hours, minutes = divmod(total_minutes, 60)
+                return f"{int(hours)}h {int(minutes)}m"
+            except Exception as e:
+                return ' '
+
+        df['Total Duration'] = df.apply(calculate_duration, axis=1)
+
         df['Punch Records'].replace('NaN', pd.NA, inplace=True)
         df['Records'].replace('NaN', pd.NA, inplace=True)
+
         df['Employee Status'] = df['Records'].apply(lambda x: 'Present' if pd.notna(x) and x != '' else 'Absent')
 
 
@@ -103,7 +185,7 @@ def upload_file():
             words_to_check = ['Att. Date', 'InTime', 'OutTime', 'Shift', 'S. InTime', 'S. OutTime',
                             'Punch Records', 'Records']
 
-            if row.name > 0: 
+            if row.name > 0:
                 for word in words_to_check:
                     if pd.notna(row[word]) and any(word in str(cell) for cell in row):
                         row['Employee Status'] = " "
@@ -156,6 +238,8 @@ def upload_file():
 
         df['Records_Dup'], df['Validity'] = zip(*df['Records_Dup'].apply(check_and_adjust_entries))
 
+        df['Corrected Records'] = df['Records']
+
         def update_approx_break_time(row):
             if row['Employee Status'] == 'Absent':
                 return 'N/A'
@@ -170,8 +254,6 @@ def upload_file():
 
         df['Approx. Break Time'] = df.apply(update_approx_break_time, axis=1)
 
-
-        
         def remove_first_in_last_out(records):
             entries = records.split(', ')
             if len(entries) > 0 and entries[0].endswith('in(ED)'):
@@ -218,7 +300,6 @@ def upload_file():
             else:
                 return f"{mins} mins"
 
-       
         def final_update_approx_break_time(row):
             if 'Partially valid' in row['Approx. Break Time']:
                 break_time_minutes = calculate_break_time(row['Records_Dup'])
@@ -237,7 +318,7 @@ def upload_file():
             else:
                 return row['Approx. Break Time']
 
-        df['Approx. Break Time'] = df.apply(final_update_approx_break_time, axis=1)
+        df['Approx. Break Time'] = df.apply(final_update_approx_break_time, axis=1)  
 
         def handle_invalid_entries(approx_break_time):
             if pd.isna(approx_break_time):
@@ -297,7 +378,6 @@ def upload_file():
                 return f"{mins} mins"
 
         df['Break Time'] = df.apply(calculate_break_time, axis=1)
-
         df['Break Time'] = df['Break Time'].apply(format_break_time)
 
         def update_break_time_for_missing_records(row):
@@ -312,7 +392,7 @@ def upload_file():
 
         df['Employee Status'] = df['Records'].apply(lambda x: 'Present' if pd.notna(x) and x != '' else 'Absent')
 
-        columns_to_drop = ['Records','Records_Dup','Validity']
+        columns_to_drop = ['Records_Dup','Validity','Records']
 
         df.columns = df.columns.str.strip()
 
@@ -320,7 +400,7 @@ def upload_file():
 
         def mark_columns_empty(row):
             words_to_check = ['Att. Date', 'InTime', 'OutTime', 'Shift', 'S. InTime', 'S. OutTime',
-                            'Punch Records', 'Records']
+                            'Punch Records', 'Corrected Records']
 
             if row.name > 0:
                 for word in words_to_check:
@@ -365,16 +445,7 @@ def upload_file():
                 row['Records Status'] = " "
                 row['Break Time'] = " "
                 row['Approx. Break Time'] = " "
-            elif row.isna().all():
-                row['Employee Status'] = " "
-                row['Records Status'] = " "
-                row['Break Time'] = " "
-            elif 'Records' in row and (pd.isna(row['Records']) or row['Records'].strip() == ''):
-                row['Employee Status'] = " "
-                row['Break Time'] = " "
-            elif 'Records Status' in row and row['Records Status'].strip() == '':
-                row['Employee Status'] = " "
-                row['Break Time'] = " "
+                row['Total Duration'] = " "
             else:
                 if 'Punch Records' in row and pd.notna(row['Punch Records']) and row['Punch Records'].strip() != '':
                     row['Employee Status'] = "Present"
@@ -385,9 +456,8 @@ def upload_file():
         df = df.apply(lambda row: check_nan_and_update_status(row, cols_to_check), axis=1)
 
         df = df.apply(mark_columns_empty, axis=1)
-
-        columns_order = [col for col in df.columns if col not in ['Employee Status', 'Records Status', 'Break Time', 'Approx. Break Time']]
-        columns_order += ['Employee Status', 'Records Status', 'Break Time', 'Approx. Break Time']
+        columns_order = [col for col in df.columns if col not in ['Corrected Records', 'Records Status','Total Duration', 'Employee Status', 'Break Time', 'Approx. Break Time']]
+        columns_order += ['Corrected Records', 'Records Status', 'Total Duration', 'Employee Status', 'Break Time', 'Approx. Break Time']
         df = df[columns_order]
 
         def should_drop_row(row):
@@ -396,9 +466,73 @@ def upload_file():
 
         df = df[~df.apply(should_drop_row, axis=1)]
 
+        # # leave_dates = []
+        # # total_leaves = 0
+
+        # leave_dates_df = pd.DataFrame([leave_dates_row])
+        # emp_code_index = df.index[df['Att. Date'].str.contains('Emp Code:', na=False)].tolist()[0]
+
+        # leave_dates_row = {
+        #     'Att. Date': 'Leave Dates:',
+        #     'InTime': leave_dates[0] if leave_dates else '',
+        #     'OutTime': 'No. of leaves:',
+        #     'Shift': total_leaves,
+        #     'S. InTime': '',
+        #     'S. OutTime': '',
+        #     'Punch Records': '',
+        #     'Corrected Records': '',
+        #     'Records Status': '',
+        #     'Total Duration': '',
+        #     'Employee Status': '',
+        #     'Break Time': '',
+        #     'Approx. Break Time': '' 
+        # }
+
+        # df = pd.concat([df.iloc[:emp_code_index + 1], leave_dates_df, df.iloc[emp_code_index + 1:]], ignore_index=True)
+
+        # Initialize leave_dates and total_leaves
+        leave_dates = []
+        total_leaves = 0
+
+        # Calculate leave dates
+        for idx, row in df.iterrows():
+            att_date = pd.to_datetime(row['Att. Date'], errors='coerce')
+            day_of_week = att_date.weekday() if pd.notnull(att_date) else None
+            
+            if row['Employee Status'] == 'Absent' and day_of_week is not None and day_of_week < 5:
+                leave_dates.append(row['Att. Date'])
+                total_leaves += 1
+
+        # Create a new row for leave dates and total leaves
+        leave_dates_row = {
+            'Att. Date': 'Leave Dates:',
+            'InTime': ', '.join(leave_dates) if leave_dates else '',
+            'OutTime': 'No. of leaves:',
+            'Shift': total_leaves,
+            'S. InTime': '',
+            'S. OutTime': '',
+            'Punch Records': '',
+            'Corrected Records': '',
+            'Records Status': '',
+            'Total Duration': '',
+            'Employee Status': '',
+            'Break Time': '',
+            'Approx. Break Time': ''
+        }
+
+        # Convert the new row into a DataFrame
+        leave_dates_df = pd.DataFrame([leave_dates_row])
+
+        # Check for the 'Emp Code:' row and insert the new row
+        try:
+            emp_code_index = df.index[df['Att. Date'].astype(str).str.contains('Emp Code:', na=False)].tolist()[0]
+            df = pd.concat([df.iloc[:emp_code_index + 1], leave_dates_df, df.iloc[emp_code_index + 1:]], ignore_index=True)
+        except IndexError:
+            print("Error: 'Emp Code:' not found in the 'Att. Date' column")
+
+
         temp_file_path = 'temp_file.xlsx'
         df.to_excel(temp_file_path, index=False)
-
         wb = load_workbook(temp_file_path)
         ws = wb.active
 
@@ -412,11 +546,9 @@ def upload_file():
                             top=Side(style='thin'),
                             bottom=Side(style='thin'))
 
-        
-        break_time_col_idx = df.columns.get_loc('Break Time') + 1  
-        approx_break_time_col_idx = df.columns.get_loc('Approx. Break Time') + 1 
+        break_time_col_idx = df.columns.get_loc('Break Time') + 1
+        approx_break_time_col_idx = df.columns.get_loc('Approx. Break Time') + 1
 
-       
         for row in ws.iter_rows(min_row=2, min_col=break_time_col_idx, max_col=break_time_col_idx):
             for cell in row:
                 cell.fill = aqua_fill
@@ -426,6 +558,7 @@ def upload_file():
             for cell in row:
                 cell.fill = f8c9eb_fill
                 cell.border = thin_border
+
 
         for cell in ws[1]:
             cell.fill = head_fill
@@ -437,8 +570,7 @@ def upload_file():
                         cell.fill = fill
                         cell.border = thin_border
 
-        keywords = ["Employee Name :", "Department:", "Emp Code:"]
-
+        keywords = ["Employee Name :", "Department:", "Emp Code:", "Leave Dates:", "No. of leaves:"]
         fill_specific_cells(ws, keywords, specific_fill)
 
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
@@ -446,13 +578,15 @@ def upload_file():
 
         column_widths = {
             'InTime': 14.29,
-            'OutTime': 15.78,
+            'OutTime': 22.56,
             'Shift': 14.29,
             'S. InTime': 14.29,
             'S. OutTime': 14.29,
             'Punch Records': 38.57,
+            'Corrected Records': 38.57,
             'Approx. Break Time': 38.57,
             'Break Time': 16.00,
+            'Total Duration': 16.00,
             'Att. Date': 21.44,
             'Employee Status': 21.44,
             'Records Status': 21.44
@@ -470,11 +604,22 @@ def upload_file():
             for cell in row:
                 cell.alignment = alignment
 
-        wb.save('formatted_file.xlsx')
+        employee_name = None
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+            for cell in row:
+                if cell.value == "Employee Name :":
+                    employee_name = cell.offset(column=3).value
+                    break
+            if employee_name:
+                break
 
-        formatted_file_name = f'formatted_file_{len(output_files) + 1}.xlsx'
-        wb.save(formatted_file_name)
-        output_files.append(formatted_file_name)
+        if not employee_name:
+            employee_name = "Unnamed_Employee"
+
+        output_file_name = f"{employee_name}.xlsx"
+
+        wb.save(output_file_name)
+        output_files.append(output_file_name)
 
     zip_filename = 'processed_files.zip'
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
@@ -483,6 +628,7 @@ def upload_file():
             os.remove(output_file)  
 
     return send_file(zip_filename, download_name=zip_filename, as_attachment=True)
+
 
 @app.route('/split', methods=['POST'])
 def split_file():
