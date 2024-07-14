@@ -746,187 +746,33 @@ body{
   }
 
   .animal {
-    width: 1500%;
+    margin-top: 150%;
+    width: 100%;
   }
 
+  @media (min-width: 40px) {
+    .animal {
+      display: none;
+    }
+  }
 
-
+  
   /* Wavy Text */
 
-
-  /* .waveTextAnimated {
-    margin-top: 0.6em;
-    text-align: center;
-}
-
-.waveTextAnimated span {
-    display: inline-block;
-    -webkit-animation: wave-text 1s ease-in-out infinite;
-            animation: wave-text 1s ease-in-out infinite;
-  }
-
-  .waveTextAnimated span:nth-of-type(1) {
-    -webkit-animation-delay: 0s;
-            animation-delay: 0s;
-  }
-  .waveTextAnimated span:nth-of-type(2) {
-    -webkit-animation-delay: 0.1s;
-            animation-delay: 0.1s;
-  }
-  .waveTextAnimated span:nth-of-type(3) {
-    -webkit-animation-delay: 0.2s;
-            animation-delay: 0.2s;
-  }
-  .waveTextAnimated span:nth-of-type(4) {
-    -webkit-animation-delay: 0.3s;
-            animation-delay: 0.3s;
-  }
-  .waveTextAnimated span:nth-of-type(5) {
-    -webkit-animation-delay: 0.4s;
-            animation-delay: 0.4s;
-  }
-  .waveTextAnimated span:nth-of-type(6) {
-    -webkit-animation-delay: 0.5s;
-            animation-delay: 0.5s;
-  }
-  .waveTextAnimated span:nth-of-type(7) {
-    -webkit-animation-delay: 0.6s;
-            animation-delay: 0.6s;
-  }
-  .waveTextAnimated span:nth-of-type(8) {
-    -webkit-animation-delay: 0.7s;
-            animation-delay: 0.7s;
-  }
-
-  @-webkit-keyframes wave-text {
-    00% {
-      transform: translateY(0em);
-    }
-    60% {
-      transform: translateY(-0.6em);
-    }
-    100% {
-      transform: translateY(0em);
-    }
-  }
-   
-  @keyframes wave-text {
-    00% {
-      transform: translateY(0em);
-    }
-    60% {
-      transform: translateY(-0.6em);
-    }
-    100% {
-      transform: translateY(0em);
-    }
-  } */
-
-
-
-
-
-
-  .deconstructed {
+  .waviy {
     position: relative;
-    margin: auto;
-    height: 0.71em;
-    color: transparent;
-    font-family: 'Cambay', sans-serif;
-    letter-spacing: -0.02em;
-    line-height: 1.03em;
   }
-  
-  .deconstructed > div {
-    position: absolute;
-    top: -15;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    color: var(--dark);
-    pointer-events: none;
+  .waviy span {
+    position: relative;
+    display: inline-block;
+    font-size: 25px;
+    color: #fff;
+    text-transform: uppercase;
+    animation: flip 2s infinite;
+    animation-delay: calc(.2s * var(--i))
   }
-  
-  .deconstructed > div:nth-child(1) {
-    -webkit-mask-image: linear-gradient(black 25%, transparent 25%);
-    mask-image: linear-gradient(black 25%, transparent 25%);
-    animation: deconstructed1 5s infinite;
-  }
-  
-  .deconstructed > div:nth-child(2) {
-    -webkit-mask-image: linear-gradient(transparent 25%, black 25%, black 50%, transparent 50%);
-    mask-image: linear-gradient(transparent 25%, black 25%, black 50%, transparent 50%);
-    animation: deconstructed2 5s infinite;
-  }
-  
-  .deconstructed > div:nth-child(3) {
-     -webkit-mask-image: linear-gradient(transparent 50%, black 50%, black 75%, transparent 75%);
-    mask-image: linear-gradient(transparent 50%, black 50%, black 75%, transparent 75%);
-    animation: deconstructed3 5s infinite;
-  }
-  
-  .deconstructed > div:nth-child(4) {
-     -webkit-mask-image: linear-gradient(transparent 75%, black 75%);
-    mask-image: linear-gradient(transparent 75%, black 75%);
-    animation: deconstructed4 5s infinite;
-  }
-  
-  @keyframes deconstructed1 {
-    0% {
-      transform: translateX(100%);
-    }
-    26% {
-      transform: translateX(0%);
-    }
-    83% {
-      transform: translateX(-0.1%);
-    }
-    100% {
-      transform: translateX(-120%);
-    }
-  }
-  
-  @keyframes deconstructed2 {
-    0% {
-      transform: translateX(100%);
-    }
-    24% {
-      transform: translateX(0.5%);
-    }
-    82% {
-      transform: translateX(-0.2%);
-    }
-    100% {
-      transform: translateX(-125%);
-    }
-  }
-  
-  @keyframes deconstructed3 {
-    0% {
-      transform: translateX(100%);
-    }
-    22% {
-      transform: translateX(0%);
-    }
-    81% {
-      transform: translateX(0%);
-    }
-    100% {
-      transform: translateX(-130%);
-    }
-  }
-  
-  @keyframes deconstructed4 {
-    0% {
-      transform: translateX(100%);
-    }
-    20% {
-      transform: translateX(0%);
-    }
-    80% {
-      transform: translateX(0%);
-    }
-    100% {
-      transform: translateX(-135%);
+  @keyframes flip {
+    0%,80% {
+      transform: rotateY(360deg) 
     }
   }
