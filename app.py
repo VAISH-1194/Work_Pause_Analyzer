@@ -491,6 +491,150 @@ def upload_file():
         # df = pd.concat([df.iloc[:emp_code_index + 1], leave_dates_df, df.iloc[emp_code_index + 1:]], ignore_index=True)
 
         # Initialize leave_dates and total_leaves
+    #     leave_dates = []
+    #     total_leaves = 0
+
+    #     # Calculate leave dates
+    #     for idx, row in df.iterrows():
+    #         att_date = pd.to_datetime(row['Att. Date'], errors='coerce')
+    #         day_of_week = att_date.weekday() if pd.notnull(att_date) else None
+            
+    #         if row['Employee Status'] == 'Absent' and day_of_week is not None and day_of_week < 5:
+    #             leave_dates.append(row['Att. Date'])
+    #             total_leaves += 1
+
+    #     # Create a new row for leave dates and total leaves
+    #     leave_dates_row = {
+    #         'Att. Date': 'Leave Dates:',
+    #         'InTime': ', '.join(leave_dates) if leave_dates else '',
+    #         'OutTime': 'No. of leaves:',
+    #         'Shift': total_leaves,
+    #         'S. InTime': '',
+    #         'S. OutTime': '',
+    #         'Punch Records': '',
+    #         'Corrected Records': '',
+    #         'Records Status': '',
+    #         'Total Duration': '',
+    #         'Employee Status': '',
+    #         'Break Time': '',
+    #         'Approx. Break Time': ''
+    #     }
+
+    #     # Convert the new row into a DataFrame
+    #     leave_dates_df = pd.DataFrame([leave_dates_row])
+
+    #     # Check for the 'Emp Code:' row and insert the new row
+    #     try:
+    #         emp_code_index = df.index[df['Att. Date'].astype(str).str.contains('Emp Code:', na=False)].tolist()[0]
+    #         df = pd.concat([df.iloc[:emp_code_index + 1], leave_dates_df, df.iloc[emp_code_index + 1:]], ignore_index=True)
+    #     except IndexError:
+    #         print("Error: 'Emp Code:' not found in the 'Att. Date' column")
+
+
+    #     temp_file_path = 'temp_file.xlsx'
+    #     df.to_excel(temp_file_path, index=False)
+    #     wb = load_workbook(temp_file_path)
+    #     ws = wb.active
+
+    #     aqua_fill = PatternFill(start_color="CCDCF8", end_color="CCDCF8", fill_type="solid")
+    #     f8c9eb_fill = PatternFill(start_color="F9D3EE", end_color="F9D3EE", fill_type="solid")
+    #     head_fill = PatternFill(start_color="DBFBEA", end_color="DBFBEA", fill_type="solid")
+    #     specific_fill = PatternFill(start_color="D9C5E9", end_color="D9C5E9", fill_type="solid")
+
+    #     thin_border = Border(left=Side(style='thin'),
+    #                         right=Side(style='thin'),
+    #                         top=Side(style='thin'),
+    #                         bottom=Side(style='thin'))
+
+    #     break_time_col_idx = df.columns.get_loc('Break Time') + 1
+    #     approx_break_time_col_idx = df.columns.get_loc('Approx. Break Time') + 1
+
+    #     for row in ws.iter_rows(min_row=2, min_col=break_time_col_idx, max_col=break_time_col_idx):
+    #         for cell in row:
+    #             cell.fill = aqua_fill
+    #             cell.border = thin_border
+
+    #     for row in ws.iter_rows(min_row=2, min_col=approx_break_time_col_idx, max_col=approx_break_time_col_idx):
+    #         for cell in row:
+    #             cell.fill = f8c9eb_fill
+    #             cell.border = thin_border
+
+
+    #     for cell in ws[1]:
+    #         cell.fill = head_fill
+
+    #     def fill_specific_cells(ws, keywords, fill):
+    #         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+    #             for cell in row:
+    #                 if cell.value in keywords:
+    #                     cell.fill = fill
+    #                     cell.border = thin_border
+
+    #     keywords = ["Employee Name :", "Department:", "Emp Code:", "Leave Dates:", "No. of leaves:"]
+    #     fill_specific_cells(ws, keywords, specific_fill)
+
+    #     for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+    #         ws.row_dimensions[row[0].row].height = 33.60
+
+    #     column_widths = {
+    #         'InTime': 14.29,
+    #         'OutTime': 22.56,
+    #         'Shift': 14.29,
+    #         'S. InTime': 14.29,
+    #         'S. OutTime': 14.29,
+    #         'Punch Records': 38.57,
+    #         'Corrected Records': 38.57,
+    #         'Approx. Break Time': 38.57,
+    #         'Break Time': 16.00,
+    #         'Total Duration': 16.00,
+    #         'Att. Date': 21.44,
+    #         'Employee Status': 21.44,
+    #         'Records Status': 21.44
+    #     }
+
+    #     for col_name, width in column_widths.items():
+    #         if col_name in df.columns:
+    #             col_idx = df.columns.get_loc(col_name) + 1
+    #             col_letter = ws.cell(row=1, column=col_idx).column_letter
+    #             ws.column_dimensions[col_letter].width = width
+
+    #     alignment = Alignment(horizontal='center', vertical='center')
+
+    #     for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+    #         for cell in row:
+    #             cell.alignment = alignment
+
+    #     employee_name = None
+    #     for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+    #         for cell in row:
+    #             if cell.value == "Employee Name :":
+    #                 employee_name = cell.offset(column=3).value
+    #                 break
+    #         if employee_name:
+    #             break
+
+    #     if not employee_name:
+    #         employee_name = "Unnamed_Employee"
+
+    #     output_file_name = f"{employee_name}.xlsx"
+
+    #     # Save the final Excel file
+    #     wb.save(output_file_name)
+
+    #     # Add the output file to the list
+    #     output_files.append(output_file_name)
+
+    # # Prepare to create a zip file
+    # zip_filename = 'processed_files.zip'
+    # with zipfile.ZipFile(zip_filename, 'w') as zipf:
+    #     for output_file in output_files:
+    #         zipf.write(output_file)
+    #         os.remove(output_file)  
+
+    # # Send the zip file as a response
+    # return send_file(zip_filename, download_name=zip_filename, as_attachment=True)
+
+
         leave_dates = []
         total_leaves = 0
 
@@ -498,7 +642,7 @@ def upload_file():
         for idx, row in df.iterrows():
             att_date = pd.to_datetime(row['Att. Date'], errors='coerce')
             day_of_week = att_date.weekday() if pd.notnull(att_date) else None
-            
+
             if row['Employee Status'] == 'Absent' and day_of_week is not None and day_of_week < 5:
                 leave_dates.append(row['Att. Date'])
                 total_leaves += 1
@@ -530,7 +674,6 @@ def upload_file():
         except IndexError:
             print("Error: 'Emp Code:' not found in the 'Att. Date' column")
 
-
         temp_file_path = 'temp_file.xlsx'
         df.to_excel(temp_file_path, index=False)
         wb = load_workbook(temp_file_path)
@@ -558,7 +701,6 @@ def upload_file():
             for cell in row:
                 cell.fill = f8c9eb_fill
                 cell.border = thin_border
-
 
         for cell in ws[1]:
             cell.fill = head_fill
@@ -617,16 +759,18 @@ def upload_file():
             employee_name = "Unnamed_Employee"
 
         output_file_name = f"{employee_name}.xlsx"
-
         wb.save(output_file_name)
         output_files.append(output_file_name)
 
+    # Prepare to create a zip file
     zip_filename = 'processed_files.zip'
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for output_file in output_files:
-            zipf.write(output_file)
-            os.remove(output_file)  
+            if os.path.exists(output_file):
+                zipf.write(output_file)
+                os.remove(output_file)  
 
+    # Send the zip file as a response
     return send_file(zip_filename, download_name=zip_filename, as_attachment=True)
 
 
@@ -669,3 +813,4 @@ def split_file():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
