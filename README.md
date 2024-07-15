@@ -49,7 +49,7 @@ During the processing of punch records, we faced significant challenges due to:
 ->	**Missing Entries:** Incomplete records that lack either the punch-in or punch-out times.
 Filtering out only the valid entries often led to inaccuracies in calculating the total duration of work, as missing entries resulted in incomplete data.
 
-**Steps involved in the Processing**
+## **Steps involved in the Processing**
 
 **Read the Excel File:**
 •	The application reads the uploaded Excel file containing the punch records.
