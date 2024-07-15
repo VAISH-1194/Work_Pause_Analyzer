@@ -554,14 +554,11 @@ def upload_file():
         header_row_height = 33.60  
         data_row_height = 33.60 
 
-        # Set the height of the header row
         ws.row_dimensions[1].height = header_row_height
 
-        # Set the height of data rows
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
             ws.row_dimensions[row[0].row].height = data_row_height
 
-        # Define columns and their respective widths
         column_widths = {
             'InTime': 14.29,
             'OutTime': 22.56,
@@ -578,30 +575,26 @@ def upload_file():
             'Records Status': 21.44
         }
 
-        # Set the column widths
         for col_name, width in column_widths.items():
             if col_name in df.columns:
                 col_idx = df.columns.get_loc(col_name) + 1
                 col_letter = ws.cell(row=1, column=col_idx).column_letter
                 ws.column_dimensions[col_letter].width = width
 
-        # Center-align all cells horizontally and vertically
         alignment = Alignment(horizontal='center', vertical='center')
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
             for cell in row:
                 cell.alignment = alignment
 
-        # Locate the employee name in the worksheet
         employee_name = None
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
             for cell in row:
                 if cell.value == "Employee Name :":
-                    employee_name = cell.offset(column=3).value  # Get the value of the next cell in the same row
+                    employee_name = cell.offset(column=3).value
                     break
             if employee_name:
                 break
 
-        # Use a default name if employee name is not found
         if not employee_name:
             employee_name = "Unnamed_Employee"
 
@@ -609,7 +602,6 @@ def upload_file():
         wb.save(output_file_name)
         output_files.append(output_file_name)
 
-    # Prepare to create a zip file
     zip_filename = 'processed_files.zip'
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for output_file in output_files:
@@ -617,7 +609,6 @@ def upload_file():
                 zipf.write(output_file)
                 os.remove(output_file)  
 
-    # Send the zip file as a response
     return send_file(zip_filename, download_name=zip_filename, as_attachment=True)
 
 
