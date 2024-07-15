@@ -746,17 +746,11 @@ body{
   }
 
   .animal {
-    margin-top: 150%;
-    width: 100%;
+    width: 1500%;
   }
 
-  @media (min-width: 40px) {
-    .animal {
-      display: none;
-    }
-  }
 
-  
+
   /* Wavy Text */
 
   .waviy {
