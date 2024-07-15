@@ -413,8 +413,10 @@ def upload_file():
 
         def update_status_based_on_records(records, punch_records):
             if pd.isna(records) or records.strip() == '':
-                return 'Absent'
-
+                if pd.isna(punch_records) or punch_records.strip() == '':
+                    return 'Absent'
+                else:
+                    return 'Punch records missing'
             entries = records.split(', ')
 
             if len(entries) == 1:
@@ -674,6 +676,7 @@ def upload_file():
         except IndexError:
             print("Error: 'Emp Code:' not found in the 'Att. Date' column")
 
+
         temp_file_path = 'temp_file.xlsx'
         df.to_excel(temp_file_path, index=False)
         wb = load_workbook(temp_file_path)
@@ -683,41 +686,63 @@ def upload_file():
         f8c9eb_fill = PatternFill(start_color="F9D3EE", end_color="F9D3EE", fill_type="solid")
         head_fill = PatternFill(start_color="DBFBEA", end_color="DBFBEA", fill_type="solid")
         specific_fill = PatternFill(start_color="D9C5E9", end_color="D9C5E9", fill_type="solid")
+        baabcd_fill = PatternFill(start_color="BAABCD", end_color="BAABCD", fill_type="solid")
 
+        # Define border style
         thin_border = Border(left=Side(style='thin'),
                             right=Side(style='thin'),
                             top=Side(style='thin'),
                             bottom=Side(style='thin'))
 
+        # Get column indices
+        att_date_col_idx = df.columns.get_loc('Att. Date') + 1
         break_time_col_idx = df.columns.get_loc('Break Time') + 1
         approx_break_time_col_idx = df.columns.get_loc('Approx. Break Time') + 1
 
-        for row in ws.iter_rows(min_row=2, min_col=break_time_col_idx, max_col=break_time_col_idx):
-            for cell in row:
-                cell.fill = aqua_fill
-                cell.border = thin_border
+        # Keywords to check for
+        header_keywords = ["Employee Name :", "Department:", "Emp Code:", "Leave Dates:", "No. of leaves:"]
 
-        for row in ws.iter_rows(min_row=2, min_col=approx_break_time_col_idx, max_col=approx_break_time_col_idx):
-            for cell in row:
-                cell.fill = f8c9eb_fill
-                cell.border = thin_border
-
-        for cell in ws[1]:
-            cell.fill = head_fill
-
-        def fill_specific_cells(ws, keywords, fill):
+        # Function to fill specific cells with the defined color
+        def fill_specific_cells(ws, keywords, header_fill, value_fill):
             for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
                 for cell in row:
                     if cell.value in keywords:
-                        cell.fill = fill
+                        cell.fill = header_fill
                         cell.border = thin_border
+                        if cell.value == "Employee Name :":
+                            related_cell = cell.offset(column=3)  # 3rd cell from "Employee Name"
+                        else:
+                            related_cell = cell.offset(column=1)  # Next cell for other keywords
+                        related_cell.fill = value_fill
+                        related_cell.border = thin_border
 
-        keywords = ["Employee Name :", "Department:", "Emp Code:", "Leave Dates:", "No. of leaves:"]
-        fill_specific_cells(ws, keywords, specific_fill)
+        # Apply fill color to header row
+        for cell in ws[1]:
+            cell.fill = head_fill
 
+        # Fill specific cells
+        fill_specific_cells(ws, header_keywords, specific_fill, baabcd_fill)
+
+        # Apply fill color to "Break Time" and "Approx. Break Time" columns if "Att. Date" is present and the row doesn't start with specific keywords
+        for row in ws.iter_rows(min_row=2):
+            if row[att_date_col_idx - 1].value and row[0].value not in header_keywords:
+                row[break_time_col_idx - 1].fill = aqua_fill
+                row[break_time_col_idx - 1].border = thin_border
+                row[approx_break_time_col_idx - 1].fill = f8c9eb_fill
+                row[approx_break_time_col_idx - 1].border = thin_border
+
+        # Set the height of each row
+        header_row_height = 33.60  # Approximately 100px
+        data_row_height = 33.60  # Approximately 100px
+
+        # Set the height of the header row
+        ws.row_dimensions[1].height = header_row_height
+
+        # Set the height of data rows
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
-            ws.row_dimensions[row[0].row].height = 33.60
+            ws.row_dimensions[row[0].row].height = data_row_height
 
+        # Define columns and their respective widths
         column_widths = {
             'InTime': 14.29,
             'OutTime': 22.56,
@@ -734,27 +759,30 @@ def upload_file():
             'Records Status': 21.44
         }
 
+        # Set the column widths
         for col_name, width in column_widths.items():
             if col_name in df.columns:
                 col_idx = df.columns.get_loc(col_name) + 1
                 col_letter = ws.cell(row=1, column=col_idx).column_letter
                 ws.column_dimensions[col_letter].width = width
 
+        # Center-align all cells horizontally and vertically
         alignment = Alignment(horizontal='center', vertical='center')
-
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
             for cell in row:
                 cell.alignment = alignment
 
+        # Locate the employee name in the worksheet
         employee_name = None
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
             for cell in row:
                 if cell.value == "Employee Name :":
-                    employee_name = cell.offset(column=3).value
+                    employee_name = cell.offset(column=3).value  # Get the value of the next cell in the same row
                     break
             if employee_name:
                 break
 
+        # Use a default name if employee name is not found
         if not employee_name:
             employee_name = "Unnamed_Employee"
 
