@@ -114,6 +114,8 @@ process, Work Pause Analyzer provides a reliable and user-friendly solution for 
 Work Pause Analyzer aims to help businesses optimize their workforce management through its powerful yet easy-to-use features, 
 making it an essential tool for enhancing organizational productivity and efficiency.
 
+## **Images**
+
 ![image](https://github.com/user-attachments/assets/460e7543-5ec3-4f31-9851-5132b5569793)
 
 ![Screenshot 2024-07-15 024559](https://github.com/user-attachments/assets/c4ce9510-a7b4-4514-ac33-4dc2060a5cfc)
