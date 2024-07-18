@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, render_template, send_file, Response
 import pandas as pd
 import os
 import zipfile
@@ -586,6 +586,35 @@ def upload_file():
             for cell in row:
                 cell.alignment = alignment
 
+    #     employee_name = None
+    #     for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+    #         for cell in row:
+    #             if cell.value == "Employee Name :":
+    #                 employee_name = cell.offset(column=3).value
+    #                 break
+    #         if employee_name:
+    #             break
+
+    #     if not employee_name:
+    #         employee_name = "Unnamed_Employee"
+
+    #     output_file_name = f"{employee_name}.xlsx"
+    #     wb.save(output_file_name)
+    #     output_files.append(output_file_name)
+
+    # zip_filename = 'processed_files.zip'
+    # with zipfile.ZipFile(zip_filename, 'w') as zipf:
+    #     for output_file in output_files:
+    #         if os.path.exists(output_file):
+    #             zipf.write(output_file)
+    #             os.remove(output_file)  
+
+    # return send_file(zip_filename, download_name=zip_filename, as_attachment=True)
+
+
+
+     #Zip_file change response
+     
         employee_name = None
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
             for cell in row:
@@ -607,9 +636,22 @@ def upload_file():
         for output_file in output_files:
             if os.path.exists(output_file):
                 zipf.write(output_file)
-                os.remove(output_file)  
+                os.remove(output_file)
 
-    return send_file(zip_filename, download_name=zip_filename, as_attachment=True)
+    with open(zip_filename, 'rb') as f:
+        zip_data = f.read()
+
+    os.remove(zip_filename)
+
+    response = Response(
+        zip_data,
+        mimetype='application/zip',
+        headers={'Content-Disposition': 'attachment; filename=processed_files.zip'}
+    )
+
+    return response
+
+
 
 
 @app.route('/split', methods=['POST'])
@@ -642,12 +684,36 @@ def split_file():
                 header_df.to_excel(writer, index=False, header=False, startrow=j)
             table.to_excel(writer, index=False, header=False, startrow=len(headers))
 
-    zip_filename = 'split_files.zip'
+    # zip_filename = 'split_files.zip'
+    # with zipfile.ZipFile(zip_filename, 'w') as zipf:
+    #     for output_file in output_files:
+    #         zipf.write(output_file, os.path.basename(output_file))
+    
+    # return send_file(zip_filename, as_attachment=True)
+
+
+
+    #Zip_file change response
+
+        zip_filename = 'split_files.zip'
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for output_file in output_files:
             zipf.write(output_file, os.path.basename(output_file))
-    
-    return send_file(zip_filename, as_attachment=True)
+
+    with open(zip_filename, 'rb') as f:
+        zip_data = f.read()
+
+    os.remove(zip_filename)
+    for output_file in output_files:
+        os.remove(output_file)
+
+    response = Response(
+        zip_data,
+        mimetype='application/zip',
+        headers={'Content-Disposition': 'attachment; filename=split_files.zip'}
+    )
+
+    return response
 
 if __name__ == "__main__":
     app.run(debug=True)
