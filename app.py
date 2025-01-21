@@ -703,9 +703,9 @@ def split_file():
     with open(zip_filename, 'rb') as f:
         zip_data = f.read()
 
-    # os.remove(zip_filename)
-    # for output_file in output_files:
-    #     os.remove(output_file)
+    os.remove(zip_filename)
+    for output_file in output_files:
+        os.remove(output_file)
 
     response = Response(
         zip_data,
